@@ -1,0 +1,170 @@
+#!/usr/bin/python3
+
+# Project 3: Password Generator Project
+
+import sys
+import random
+
+
+# generates the password according to supplied user arguments, default is a randomly generated
+# 4 word password using the words.txt
+def generatePassword(arguments) :
+
+    individual_words_in_password = []
+
+    # sets default for four word password
+    word_file = open('words.txt')
+    words = word_file.read().splitlines()
+    random_word = random.sample(words, 4)
+    for word in random_word :
+        individual_words_in_password.append(word)
+
+    i = 1
+    while i < len(arguments) :
+        arg = arguments[i]
+        word_file = open('words.txt')
+        words = word_file.read().splitlines()
+
+        try:
+            if arg == "-h" or arg == '--help':
+                print("usage: xkcdpwgen [-h] [-w WORDS] [-c CAPS] [-n NUMBERS] [-s SYMBOLS]")
+                print("")
+                print("Generate a secure, memorable password using the XKCD method")
+                print("")
+                print("optional arguments:")
+                print("-h, --help  ==> show this help message and exit")
+                print("-w WORDS, --words WORDS ==> include WORDS words in the password (default=4)")
+                print("-n NUMBERS, --numbers NUMBERS ==> insert NUMBERS random numbers in the password")
+                print("-s SYMBOLS, --symbols SYMBOLS ==> insert SYMBOLS random symbols in the password (default=0)")
+
+                break
+
+            # Checks if the number supplied after the -w or --words command is correctly supplied
+            elif arg == "-w" or arg == "--words":
+
+                index = sys.argv.index(arg)
+                # checking if there is a number supplied for number of words
+                if index + 1 < len(sys.argv):
+
+                    try :
+                        numWords = int(sys.argv[index + 1])
+                        random_words = random.sample(words, numWords)
+                        individual_words_in_password = [] # reset the default, because user overrides number of words
+
+                        for word in random_words:
+                            individual_words_in_password.append(word)
+
+                        i = i + 1
+                    except ValueError:
+                        pass
+
+            elif arg == "-c" or arg == "--caps":
+                index = sys.argv.index(arg)
+
+                # Checks if the number supplied after the -c or --caps command is correctly supplied
+                if index + 1 < len(sys.argv):
+                    try:
+                        num_to_capitalize = int(sys.argv[index + 1])
+                        words_to_capitalize = random.sample(individual_words_in_password, num_to_capitalize)
+
+                        for word in words_to_capitalize:
+                            word_index_in_pw = individual_words_in_password.index(word)
+                            individual_words_in_password[word_index_in_pw] = word.capitalize()
+                    except ValueError:
+
+                        print("\nPlease assure you are provide a valid number of words to capitalize: at most",
+                              len(individual_words_in_password), "\n")
+                        print("As follows is your currently built password you may use:")
+
+                    i = i + 1
+
+            elif arg == "-n" or arg == "--numbers":
+                index = sys.argv.index(arg)
+
+                nums_list = ["1","2","3","4","5","6","7","8","9"]
+
+                # Checks if the number supplied after the -n or --numbers command is correctly supplied
+                if index + 1 < len(sys.argv):
+                    try:
+                        num_to_add = int(sys.argv[index + 1])
+                        words_to_add_number = random.sample(individual_words_in_password, num_to_add)
+
+                        for word in words_to_add_number:
+
+                            # choose random number between 1 and 0
+                            beginning_or_end = random.choice([0, 1])
+                            random_num = random.choice(nums_list)
+                            cur_word_index = individual_words_in_password.index(word)
+
+                            if beginning_or_end == 1:
+                                # if 1, add at beginning of word
+                                individual_words_in_password[cur_word_index] = random_num + word
+                            else:
+                                # if 0 add at end of the word
+                                individual_words_in_password[cur_word_index] = word + random_num
+
+                    except ValueError:
+
+                        print("\nPlease assure you are provide a valid # of numbers to add: at most",
+                              len(individual_words_in_password), "\n")
+                        print("As follows is your currently built password you may use:")
+
+                    i = i + 1
+
+            elif arg == "-s" or arg == "--symbols":
+                index = sys.argv.index(arg)
+                symbols_list = ["~", "!", "@", "#", "$", "%", "^", "&", "*", ".", ":", ";"]
+
+                # Checks if the number supplied after the -s or --symbols command is correctly supplied
+                if index + 1 < len(sys.argv):
+                    try:
+                        num_to_add = int(sys.argv[index + 1])
+                        words_to_add_symbol = random.sample(individual_words_in_password, num_to_add)
+
+                        for word in words_to_add_symbol:
+
+                            # choose random number between 1 and 0
+                            beginning_or_end = random.choice([0, 1])
+                            random_symbol = random.choice(symbols_list)
+                            cur_word_index = individual_words_in_password.index(word)
+
+                            if beginning_or_end == 1:
+                                # if 1, add at beginning of word
+                                individual_words_in_password[cur_word_index] = random_symbol + word
+                            else:
+                                # if 0 add at end of the word
+                                individual_words_in_password[cur_word_index] = word + random_symbol
+
+                    except ValueError:
+
+                        print("\nPlease assure you are provide a valid # of symbols to add: at most",
+                              len(individual_words_in_password), "\n")
+                        print("As follows is your currently built password you may use:")
+
+                    i = i + 1
+
+            else:
+                print("Please provide a valid list of inputs for the program. -h and --help can give you.")
+
+            i = i + 1
+
+        except IndexError:
+            password = ""
+            # runs default version of xkcdpwgen, produces password with four random english words
+            random_word = random.sample(words, 4)
+
+            # combining all the random words
+            for word in random_word:
+                password = password + word
+
+    password = ""
+    for word in individual_words_in_password:
+        password = password + word
+
+    print(password)
+
+
+def main() :
+    generatePassword(sys.argv)
+
+main()
